@@ -5,7 +5,7 @@ from dataentry.models import Student
 class Command(BaseCommand):
     help = 'Insert data to the database'
 
-    def handle(self, *args, **kwargs):
+    def handle(self, *args, **options):
 
         existing_record = Student.objects.filter(roll_no=10).exists()
 
