@@ -17,3 +17,15 @@ def search_for_model(model_name):
         raise CommandError(f'Model "{model_name}" not found')
 
     return model
+
+
+# Get all custom models in all installed apps
+def get_all_custom_models():
+    default_models = ['Permission', 'Group', 'ContentType', 'Session', 'LogEntry', 'User', 'Upload']
+    all_models = []
+    for app_config in apps.get_app_configs():
+        for model in app_config.get_models():
+            if model.__name__ not in default_models:
+                all_models.append(model.__name__)
+    return all_models
+
