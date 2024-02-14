@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.conf import settings
 from utils import get_all_custom_models
 from uploads.models import Upload
-from django.core.management import call_command
 from django.contrib import messages
+from .tasks import import_data_task
 
 
 # We want to store the uploaded file but also store its contents in the database
@@ -21,15 +21,14 @@ def import_data(request):
         base_url = str(settings.BASE_DIR)
 
         full_path = base_url + relative_path
-        print(full_path)
 
-        # trigger the import data command to insert the csv contents in the database
-        try:
-            call_command('importdata', full_path, model_name)
-            messages.success(request, 'Data imported successfully!')
-        except Exception as e:
-            messages.error(request, str(e))
+        # check for csv errors
 
+        # handle the task
+        import_data_task.delay(full_path, model_name)
+
+        messages.info(request, 'Your data is being imported, '
+                               'you will be notified when is it finished')
         # redirect to the import data page
         return redirect('import_data')
     else:
